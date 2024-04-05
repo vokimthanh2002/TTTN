@@ -5,6 +5,7 @@ import com.example.demo.entity.User;
 import com.example.demo.services.EmailService;
 import com.example.demo.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,8 +32,10 @@ public class AuthController {
     private EmailService emailService;
 
     @PostMapping("/login")
-    public String login(@RequestParam String email, @RequestParam String password) {
+    public String login(@RequestParam String email, @RequestParam String password, HttpSession session) {
         if (userService.authenticate(email, password)) {
+            User user = userService.findByEmail(email);
+            session.setAttribute("user_login",user);
             return "Login successful!";
         } else {
             return "Invalid email or password!";
@@ -88,7 +91,7 @@ public class AuthController {
         return "OTP sent to your email. Please check and use it to reset your password.";
     }
 
-    @PostMapping("/verify-otp")
+    @PostMapping("/change-password")
     public ResponseEntity<?> verifyOtp(@RequestParam String otp, String newPassword, String confirmPassword) {
         if (currentOtp != null && currentOtp.equals(otp)) {
             User user = userService.findByEmail(currentEmail);

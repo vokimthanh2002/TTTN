@@ -60,4 +60,14 @@ public class UserService {
         }
         return false;
     }
+    public void addAdmin(UserDto userDto){
+        // Validate userDto and create a new user
+        User user = new User();
+        user.setRole(new Role(1L, "Admin"));
+        user.setUsername(userDto.getUsername());
+        user.setEmail(userDto.getEmail());
+        // Hash password before saving to database
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userRepository.save(user);
+    }
 }
